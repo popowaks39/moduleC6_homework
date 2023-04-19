@@ -1,0 +1,45 @@
+<html>
+	<input class="exo"></input>
+	<button class="push">Отправить</button>
+	<button class="geo">Геолокация</button>
+	<div class="response"></div>
+	<script>
+	
+		const btn = document.querySelector('.push');
+		
+		function writeToScreen(message) {
+			let response = document.querySelector('.response');
+			let vstavka = document.createElement("p");
+			vstavka.innerHTML = message;
+			response.appendChild(vstavka);
+		}
+		
+		btn.addEventListener('click', () => {
+			const exo = document.querySelector('.exo').value;
+			writeToScreen("Вы написали: " + exo);
+		
+			let socket = new WebSocket("wss://echo-ws-service.herokuapp.com/");
+			
+			socket.onopen = function(evt) {
+				socket.send(exo);
+				socket.onmessage = function(evt) {
+					writeToScreen("Сервер ответил: " + evt.data);
+				}
+				socket.onclose;
+			};
+		})
+		
+		const but = document.querySelector('.geo');
+		
+		but.addEventListener('click', () => {
+			if ("geolocation" in navigator) {
+				navigator.geolocation.getCurrentPosition((position) => {
+					const { coords } = position;
+					url = 'https://www.openstreetmap.org/#map=17/' + coords.latitude + '/' + coords.longitude;
+					writeToScreen('<a href="' + url + '">Ваша гео-локация</a>');
+				})
+			}
+		})
+		
+	</script>
+</html>
